@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: s2i-telegram-taskrun
+spec:
+  # Use service account with git and image repo credentials
+  serviceAccount: pipeline
+  taskRef:
+    name: s2i-java-8
+  inputs:
+    params:
+    - name: TLSVERIFY
+      value: "false"
+    resources:
+    - name: source
+      resourceSpec:
+        type: git
+        params:
+        - name: url
+          value: https://github.com/agiertli/tekton-hackfest.git
+  outputs:
+    resources:
+    - name: image
+      resourceSpec:
+        type: image
+        params:
+        - name: url
+          value: image-registry.openshift-image-registry.svc:5000/pipeline-test/s2i-telegram

@@ -1,0 +1,41 @@
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: telegram-image
+spec:
+  type: image
+  params:
+  - name: url
+    value: image-registry.openshift-image-registry.svc:5000/pipeline-test/s2i-telegram
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: telegram-git
+spec:
+  type: git
+  params:
+  - name: url
+    value: https://github.com/agiertli/tekton-hackfest.git
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  name: telegram-knative-deploy-pipelinerun
+spec:
+  pipelineRef:
+    name: telegram-knative-deploy-pipeline
+  inputs:
+    params:
+      - name: service
+        value: "telegram-knative-service"
+  serviceAccount: 'pipeline'
+  resources:
+  - name: app-git
+    resourceRef:
+      name: telegram-git
+  - name: app-image
+    resourceRef:
+      name: telegram-image
+
